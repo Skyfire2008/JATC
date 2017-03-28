@@ -30,3 +30,7 @@ Point.prototype.turnCCW=function(){
 Point.prototype.add=function(other){
 	return new Point(this.x+other.x, this.y+other.y);
 };
+
+module.exports={
+	Point: Point
+};
