@@ -25,6 +25,18 @@ ColorList.prototype.nextColor=function(){
 	return this.colors.shift();
 };
 
+/**
+ * Gets a certain number of next colors as an array
+ * @param num					number of colors to get
+ */
+ColorList.prototype.nextNColors=function(num){
+	var result=[];
+	for(let i=0; i<num; i++){
+		result.push(this.nextColor());
+	}
+	return result;
+};
+
 module.exports={
 	ColorList: ColorList
 };
