@@ -10,7 +10,7 @@ var geom=require("./geom.js");
  */
 function Shape(pos, points, colors, squareSize){
 	this.pos=pos;
-	this.points=points;
+	this.points=points; //TODO: consider switching to single array of "blocks"{position, color}
 	this.colors=colors;
 	this.squareSize=squareSize;
 }
@@ -27,6 +27,14 @@ Shape.prototype.turnCCW=function(){
 		this.points[i].turnCCW();
 		this.points[i].y-=this.squareSize-1;
 	}
+};
+
+shape.prototype.getGlobalPoints=function(){
+	var result=[];
+	for(let i=0; i<this.points.length; i++){
+		result.push(this.points[i].add(this.pos));
+	}
+	return result;
 };
 
 function ShapeList(colorList){
