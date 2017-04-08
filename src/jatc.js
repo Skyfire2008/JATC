@@ -19,7 +19,7 @@ function Jatc(width, height, shapeList){
 
 	this.running=false;
 	
-	this.shapeCollides=function(){
+	/*this.shapeCollides=function(){
 		var points=currentShape.getGlobalPoints();
 		
 		for(let i=0; i<points.length; i++){
@@ -27,7 +27,7 @@ function Jatc(width, height, shapeList){
 			
 			if()
 		}
-	};
+	};*/
 
 	this.moveLeft=function(){
 		
@@ -46,7 +46,9 @@ for(let i=0; i<7; i++){
 
 var canvas;
 
-
+var block=new shape.Block(10, 10, 5);
+console.log(block);
+console.log(block.add({x: 10, y: 15}));
 
 /**
  * Key press listener

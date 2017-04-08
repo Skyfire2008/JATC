@@ -1,6 +1,19 @@
 var util=require("./util.js");
 var geom=require("./geom.js");
 
+function Block(x, y, color){
+	this.x=x;
+	this.y=y;
+	this.color=color;
+
+	this.add=function(other){
+		var temp=Block.prototype.add.call(this, other);
+		return new Block(temp.x, temp.y, this.color);
+	}
+}
+
+Block.prototype=new geom.Point();
+
 /**
  * Constructor for a tetris shape
  * @param pos					position of shape's center
@@ -29,7 +42,7 @@ Shape.prototype.turnCCW=function(){
 	}
 };
 
-shape.prototype.getGlobalPoints=function(){
+Shape.prototype.getGlobalPoints=function(){
 	var result=[];
 	for(let i=0; i<this.points.length; i++){
 		result.push(this.points[i].add(this.pos));
@@ -122,6 +135,7 @@ ShapeList.prototype.nextShape=function(){
 }
 
 module.exports={
+	Block: Block,
 	Shape: Shape,
 	ShapeList: ShapeList
 };
