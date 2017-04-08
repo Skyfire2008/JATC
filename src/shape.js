@@ -23,29 +23,31 @@ Block.prototype=new geom.Point();
  */
 function Shape(pos, points, colors, squareSize){
 	this.pos=pos;
-	this.points=points; //TODO: consider switching to single array of "blocks"{position, color}
-	this.colors=colors;
+	this.blocks=[];
+	for(let i=0; i<points.length; i++){
+		this.blocks.push(new Block(points[i].x, points[i].y, colors[i]));
+	}
 	this.squareSize=squareSize;
 }
 
 Shape.prototype.turnCW=function(){
 	for(let i=0; i<this.points.length; i++){
-		this.points[i].turnCW();
-		this.points[i].x-=this.squareSize-1;
+		this.blocks[i].turnCW();
+		this.blocks[i].x-=this.squareSize-1;
 	}
 };
 
 Shape.prototype.turnCCW=function(){
 	for(let i=0; i<this.points.length; i++){
-		this.points[i].turnCCW();
-		this.points[i].y-=this.squareSize-1;
+		this.blocks[i].turnCCW();
+		this.blocks[i].y-=this.squareSize-1;
 	}
 };
 
-Shape.prototype.getGlobalPoints=function(){
+Shape.prototype.getGlobalBlocks=function(){
 	var result=[];
-	for(let i=0; i<this.points.length; i++){
-		result.push(this.points[i].add(this.pos));
+	for(let i=0; i<this.blocks.length; i++){
+		result.push(this.blocks[i].add(this.pos));
 	}
 	return result;
 };

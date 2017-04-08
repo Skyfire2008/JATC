@@ -49,6 +49,10 @@ var canvas;
 var block=new shape.Block(10, 10, 5);
 console.log(block);
 console.log(block.add({x: 10, y: 15}));
+block.turnCW();
+console.log(block);
+block.turnCCW();
+console.log(block);
 
 /**
  * Key press listener
