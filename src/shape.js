@@ -52,6 +52,24 @@ Shape.prototype.getGlobalBlocks=function(){
 	return result;
 };
 
+Object.defineProperty(Shape.prototype, "x", {
+	get: function x(){
+		return this.pos.x;
+	},
+	set: function x(x){
+		this.pos.x=x;
+	}
+});
+
+Object.defineProperty(Shape.prototype, "y", {
+	get: function y(){
+		return this.pos.y;
+	},
+	set: function y(y){
+		this.pos.y=y;
+	}
+});
+
 function ShapeList(colorList){
 	this.colorList=colorList;
 	this.shapes=this.generateShapes();
