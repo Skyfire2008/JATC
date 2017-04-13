@@ -3,15 +3,15 @@ var color=require("./color.js");
 var shape=require("./shape.js");
 var res=require("./res.js");
 
-function Jatc(width, height, shapeList){
+function Jatc(width, height, shapeList, renderCallback){
 	this.width=width;
-	this.height=heigt;
+	this.height=height;
 	this.field=[];
 
 	for(let i=0; i<width; i++){
-		field[i]=[];
+		this.field[i]=[];
 		for(let j=0; j<height; j++){
-			field[i][j]=0;
+			this.field[i][j]=-1;
 		}
 	}
 
@@ -21,11 +21,12 @@ function Jatc(width, height, shapeList){
 	this.running=false;
 
 	this.score=0;
-	this.reqMillis=500;
-	this.leftMillis=this.reqMillis;
+	this.reqMillis=100;
+
+	this.renderCallback=renderCallback;
 	
 	this.shapeCollides=function(){
-		var points=currentShape.getGlobalPoints();
+		var points=this.currentShape.getGlobalBlocks();
 		
 		for(let i=0; i<points.length; i++){
 			let currentPoint=points[i];
@@ -34,7 +35,7 @@ function Jatc(width, height, shapeList){
 				return true;
 			}else if(currentPoint.y<0 || currentPoint.y>this.height){
 				return true;
-			}else if(this.field[currentPoint.x][currentPoint.y]!=0){
+			}else if(this.field[currentPoint.x][currentPoint.y]!=-1){
 				return true;
 			}
 
@@ -43,22 +44,22 @@ function Jatc(width, height, shapeList){
 		return false;
 	};
 
-	this.pause=function(){
-		this.running=!this.running;
-	};
+	this.update=function(){
 
-	this.update=function(millis){
-		if(running){
-			this.leftMillis-=millis;
-			if(leftMillis<0){
-				this.currentShape.y+=1;
-				if(this.shapeCollides()){
-					this.currentShape.y-=1;
+		this.currentShape.y+=1;
 
-					//TODO: add shape to field, check for combinations, etc
-				}
+		if(this.shapeCollides()){
+			this.currentShape.y-=1;
+			var blocks=this.currentShape.getGlobalBlocks();
+			for(let i=0; i<blocks.length; i++){
+				let b=blocks[i];
+				this.field[b.x][b.y]=b.color;
 			}
+
+			this.currentShape=this.shapeList.nextShape();
 		}
+
+		this.renderCallback();
 	};
 
 	this.moveLeft=function(){
@@ -73,53 +74,27 @@ function Jatc(width, height, shapeList){
 	}
 }
 
-var sl=new shape.ShapeList(new color.ColorList(3));
-var s=sl.nextShape();
-s.pos.x+=10;
-console.log(s.x);
-
 var blocks=[];
-/*for(let i=0; i<7; i++){
-	let img=new Image(16, 16);
-	img.src=("assets/block"+i+".png");
-	console.log(img);
-	blocks[i]=img;
-}*/
 
 var canvas;
-
-var block=new shape.Block(10, 10, 5);
-console.log(block);
-console.log(block.add({x: 10, y: 15}));
-block.turnCW();
-console.log(block);
-block.turnCCW();
-console.log(block);
+var jatc;
 
 document.addEventListener("DOMContentLoaded", function(){
 	canvas=document.getElementById("canvas");
 
+	//load the assets
 	var blockNames=[0, 1, 2, 3, 4, 5, 6].map(function(e){
 		return "assets/block"+e+".png";
 	});
 
-	/*var img=new Image();
-	img.src="assets/block2.png";
-	img.onload=function(){
-		canvas.getContext("2d").drawImage(img, 20, 20);
-	};*/
-
 	Promise.all(blockNames.map(function(e){
 		return res.loadImage(e);
 	})).then(function(result){
-		result.map(function(e){
-			console.log(e);
-			var context=canvas.getContext("2d");
-			context.drawImage(e, 20, 20);
-		});
-	}).catch(function(err){
+		blocks=result;
+		jatc=new Jatc(10, 25, new shape.ShapeList(new color.ColorList(3)), render);
+	})/*.catch(function(err){
 		console.log("error: "+err);
-	});
+	})*/;
 });
 
 /**
@@ -138,10 +113,38 @@ document.addEventListener("keypress", function(e){
 	}else if(e.key=="r"){ //rotate CW
 
 	}else if(e.key==" "){ //pause/unpause
+		jatc.running=!jatc.running;
 
+		console.log(jatc.running);
+
+		if(jatc.running){
+			setTimeout(update, jatc.reqMillis);
+		}
 	}
 });
 
+var render=function(){
+	canvas.getContext("2d").clearRect(0, 0, 16*jatc.width, 16*jatc.height);
 
+	for(let x=0; x<jatc.width; x++){
+		for(let y=0; y<jatc.height; y++){
+			var color=jatc.field[x][y];
+			if(color!=-1){
+				canvas.getContext("2d").drawImage(blocks[color], 16*x, 16*y);
+			}
+		}
+	}
+
+	jatc.currentShape.getGlobalBlocks().forEach(function(b){
+		canvas.getContext("2d").drawImage(blocks[b.color], 16*b.x, 16*b.y);
+	});
+};
+
+var update=function(){
+	jatc.update();
+	if(jatc.running){
+		setTimeout(update, jatc.reqMillis);
+	}
+};
 
 
