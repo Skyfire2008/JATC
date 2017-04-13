@@ -31,16 +31,16 @@ function Shape(pos, points, colors, squareSize){
 }
 
 Shape.prototype.turnCW=function(){
-	for(let i=0; i<this.points.length; i++){
+	for(let i=0; i<this.blocks.length; i++){
 		this.blocks[i].turnCW();
-		this.blocks[i].x-=this.squareSize-1;
+		this.blocks[i].x+=this.squareSize-1;
 	}
 };
 
 Shape.prototype.turnCCW=function(){
-	for(let i=0; i<this.points.length; i++){
+	for(let i=0; i<this.blocks.length; i++){
 		this.blocks[i].turnCCW();
-		this.blocks[i].y-=this.squareSize-1;
+		this.blocks[i].y+=this.squareSize-1;
 	}
 };
 

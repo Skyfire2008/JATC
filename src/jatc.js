@@ -21,7 +21,7 @@ function Jatc(width, height, shapeList, renderCallback){
 	this.running=false;
 
 	this.score=0;
-	this.reqMillis=100;
+	this.reqMillis=1000;
 
 	this.renderCallback=renderCallback;
 	
@@ -54,6 +54,7 @@ function Jatc(width, height, shapeList, renderCallback){
 			for(let i=0; i<blocks.length; i++){
 				let b=blocks[i];
 				this.field[b.x][b.y]=b.color;
+				//TODO: check for combinations, increase score and level
 			}
 
 			this.currentShape=this.shapeList.nextShape();
@@ -63,15 +64,63 @@ function Jatc(width, height, shapeList, renderCallback){
 	};
 
 	this.moveLeft=function(){
-		if(running){
-			currentShape.x-=1;
+		if(this.running){
+			this.currentShape.x-=1;
 			if(this.shapeCollides()){
-				currentShape.x+=1;
+				this.currentShape.x+=1;
 			}else{
-				//TODO: dispatch event here
+				this.renderCallback();
 			}
 		}
-	}
+	};
+
+	this.moveRight=function(){
+		if(this.running){
+			this.currentShape.x+=1;
+			if(this.shapeCollides()){
+				this.currentShape.x-=1;
+			}else{
+				this.renderCallback();
+			}
+		}
+	};
+
+	this.moveDown=function(){
+		if(this.running){
+			this.currentShape.y+=1;
+			if(this.shapeCollides()){
+				this.currentShape.y-=1;
+			}else{
+				this.renderCallback();
+			}
+		}
+	};
+
+	this.turnCW=function(){
+		if(this.running){
+			this.currentShape.turnCW();
+			if(this.shapeCollides()){
+				this.currentShape.turnCCW();
+			}else{
+				this.renderCallback();
+			}
+		}
+	};
+
+	this.turnCCW=function(){
+		if(this.running){
+			this.currentShape.turnCCW();
+			if(this.shapeCollides()){
+				this.currentShape.turnCW();
+			}else{
+				this.renderCallback();
+			}
+		}
+	};
+
+	/*this.turnCW=function(){
+		if(running)
+	}*/
 }
 
 var blocks=[];
@@ -92,9 +141,9 @@ document.addEventListener("DOMContentLoaded", function(){
 	})).then(function(result){
 		blocks=result;
 		jatc=new Jatc(10, 25, new shape.ShapeList(new color.ColorList(3)), render);
-	})/*.catch(function(err){
+	}).catch(function(err){
 		console.log("error: "+err);
-	})*/;
+	});
 });
 
 /**
@@ -103,15 +152,15 @@ document.addEventListener("DOMContentLoaded", function(){
 document.addEventListener("keypress", function(e){
 
 	if(e.key=="a"){ //move left
-
+		jatc.moveLeft();
 	}else if(e.key=="s"){ //move down
-
+		jatc.moveDown();
 	}else if(e.key=="d"){ //move right
-
-	}else if(e.key=="q"){ //rotate CCW
-
-	}else if(e.key=="r"){ //rotate CW
-
+		jatc.moveRight();
+	}else if(e.key=="q"){ //turn CCW
+		jatc.turnCCW();
+	}else if(e.key=="e"){ //turn CW
+		jatc.turnCW();
 	}else if(e.key==" "){ //pause/unpause
 		jatc.running=!jatc.running;
 
@@ -121,6 +170,8 @@ document.addEventListener("keypress", function(e){
 			setTimeout(update, jatc.reqMillis);
 		}
 	}
+
+	e.preventDefault();
 });
 
 var render=function(){
@@ -141,8 +192,8 @@ var render=function(){
 };
 
 var update=function(){
-	jatc.update();
 	if(jatc.running){
+		jatc.update();
 		setTimeout(update, jatc.reqMillis);
 	}
 };
