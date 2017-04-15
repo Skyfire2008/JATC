@@ -2,6 +2,7 @@ var util=require("./util.js");
 var color=require("./color.js");
 var shape=require("./shape.js");
 var res=require("./res.js");
+var geom=require("./geom.js");
 
 function Jatc(width, height, shapeList, renderCallback){
 	this.width=width;
@@ -48,19 +49,65 @@ function Jatc(width, height, shapeList, renderCallback){
 
 		this.currentShape.y+=1;
 
-		if(this.shapeCollides()){
+		if(this.shapeCollides()){ //if shape collides with field...
 			this.currentShape.y-=1;
 			var blocks=this.currentShape.getGlobalBlocks();
-			for(let i=0; i<blocks.length; i++){
+			for(let i=0; i<blocks.length; i++){ //add it to field
 				let b=blocks[i];
 				this.field[b.x][b.y]=b.color;
-				//TODO: check for combinations, increase score and level
+			}
+
+			//TODO: check for combinations, increase score and level
+
+			let grid=[];
+			for(let i=0; i<this.width; i++){
+				grid[i]=[];
+				for(let j=0; j<this.height; j++){
+					grid[i].push(false);
+				}
+			}
+
+			for(let i=0; i<blocks.length; i++){
+				let b=blocks[i];
+				let combo=[b];
+				grid[b.x][b.y]=true;
+				this.getCombination(grid, combo, b, b.color);
+
+				console.log(combo);
+
+				if(combo.length>=3){
+					for(let j=0; j<combo.length; j++){
+						let cur=combo[j];
+						this.field[cur.x][cur.y]=-1;
+					}
+				}
 			}
 
 			this.currentShape=this.shapeList.nextShape();
 		}
 
 		this.renderCallback();
+	};
+
+	this.getCombination=function(grid, combo, pos, color){
+		var d=new geom.Point(1, 0);
+
+		for(let i=0; i<4; i++){
+			let cur=pos.add(d);
+
+			//check, that point is in bounds
+			if(cur.x<0 || cur.x>=this.width || cur.y<0 || cur.y>=this.height){
+				continue;
+			}
+			//if not visited and has the right color...
+			if(!grid[cur.x][cur.y] && this.field[cur.x][cur.y]==color){
+				combo.push(cur);
+				grid[cur.x][cur.y]=true;
+				this.getCombination(grid, combo, cur, color);
+			}
+
+			d.turnCW();
+		}
 	};
 
 	this.moveLeft=function(){
@@ -117,10 +164,6 @@ function Jatc(width, height, shapeList, renderCallback){
 			}
 		}
 	};
-
-	/*this.turnCW=function(){
-		if(running)
-	}*/
 }
 
 var blocks=[];
