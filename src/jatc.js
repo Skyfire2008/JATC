@@ -73,8 +73,6 @@ function Jatc(width, height, shapeList, renderCallback){
 				grid[b.x][b.y]=true;
 				this.getCombination(grid, combo, b, b.color);
 
-				console.log(combo);
-
 				if(combo.length>=3){
 					for(let j=0; j<combo.length; j++){
 						let cur=combo[j];
@@ -96,14 +94,14 @@ function Jatc(width, height, shapeList, renderCallback){
 			let cur=pos.add(d);
 
 			//check, that point is in bounds
-			if(cur.x<0 || cur.x>=this.width || cur.y<0 || cur.y>=this.height){
-				continue;
-			}
-			//if not visited and has the right color...
-			if(!grid[cur.x][cur.y] && this.field[cur.x][cur.y]==color){
-				combo.push(cur);
-				grid[cur.x][cur.y]=true;
-				this.getCombination(grid, combo, cur, color);
+			if(cur.x>=0 && cur.x<this.width && cur.y>=0 && cur.y<this.height){
+
+				//if not visited and has the right color...
+				if(!grid[cur.x][cur.y] && this.field[cur.x][cur.y]==color){
+					combo.push(cur);
+					grid[cur.x][cur.y]=true;
+					this.getCombination(grid, combo, cur, color);
+				}
 			}
 
 			d.turnCW();
